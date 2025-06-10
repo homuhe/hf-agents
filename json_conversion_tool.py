@@ -1,10 +1,9 @@
-from tools import tool
-from typing import List, Dict
-from smolagents import LiteLLMModel
+from smolagents import tool
+from smolagents.models import LiteLLMModel
 import json
 
 @tool
-def format_to_json(text: str) -> Dict:
+def format_to_json(text: str) -> str:
     """
     Converts a structured text into JSON format using an LLM.
     
@@ -12,7 +11,7 @@ def format_to_json(text: str) -> Dict:
         text: A string containing key-value pairs or structured data
         
     Returns:
-        A dictionary containing the parsed JSON data
+        A string containing the formatted JSON data
     """
     # Initialize the model
     model = LiteLLMModel(
@@ -37,23 +36,11 @@ def format_to_json(text: str) -> Dict:
     # Get response from LLM
     response = model.generate(messages)
     
-    # Parse and return the JSON
-    try:
-        return json.loads(response.__dict__["content"])
-    except json.JSONDecodeError:
-        return {"error": "Failed to parse JSON", "raw_content": response.__dict__["content"]}
+    # Return the JSON string
+    return response.__dict__["content"]
 
 # Example usage
 if __name__ == "__main__":
-    # Create a tool instance
-    json_tool = format_to_json
-    
-    # Print tool information
-    print(f"Tool Name: {json_tool.name}")
-    print(f"Description: {json_tool.description}")
-    print(f"Arguments: {json_tool.arguments}")
-    print(f"Outputs: {json_tool.outputs}")
-    
     # Example function call
     test_text = """
     Project Name: Test Project
@@ -61,5 +48,5 @@ if __name__ == "__main__":
     Type: Test
     Status: Active
     """
-    result = json_tool.func(test_text)
-    print(f"\nResult: {json.dumps(result, indent=2)}") 
+    result = format_to_json(test_text)
+    print(f"\nResult: {result}") 

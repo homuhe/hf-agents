@@ -3,14 +3,17 @@ from pprint import pprint
 import json
 from json_conversion_tool import format_to_json
 
-def process_llm_response(response_content: str, original_input: str) -> dict:
-    """Process the LLM's response and use tools if needed."""
-    # If not JSON, check if it's a request for JSON conversion
-    if "convert" in response_content.lower() and "json" in response_content.lower():
-        # Use the format_to_json tool with the original input
-        return format_to_json.func(original_input)
-    # If not a JSON request, return the raw content
-    return {"response": response_content}
+def process_llm_response(response: str, original_input: str) -> str:
+    """
+    Process the LLM's response and handle JSON conversion if needed.
+    """
+    # Try to parse as JSON first
+    try:
+        json.loads(response)
+        return response
+    except json.JSONDecodeError:
+        # If not JSON, use the format_to_json tool
+        return format_to_json(original_input)
 
 def run_conversion(data: str, message: str = "Can you convert this to JSON format?"):
     """Run the conversion process with given data and message."""
